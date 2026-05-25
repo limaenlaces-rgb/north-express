@@ -1,14 +1,15 @@
-// North Express · Service Worker v2.0
-const CACHE = 'nx-repartidor-v2';
+// North Express · Service Worker v3.0
+const CACHE = 'nx-repartidor-v3';
+const BASE = '/north-express/north-express';
 
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(cache => {
       return cache.addAll([
-        '/expreso-norte/norte-expreso-motorizado.html',
-        '/expreso-norte/tienda-norte-express.html',
-        '/expreso-norte/norte-express-admin-almacen.html',
-        '/expreso-norte/manifest.json',
+        BASE + '-motorizado.html',
+        BASE + '-tienda.html',
+        BASE + '-admin-almacen.html',
+        '/north-express/north-express/manifest.json',
       ]).catch(() => {});
     })
   );
@@ -33,9 +34,9 @@ self.addEventListener('fetch', e => {
   ) return;
 
   if (
-    e.request.url.includes('norte-expreso-motorizado.html') ||
-    e.request.url.includes('tienda-norte-express.html') ||
-    e.request.url.includes('norte-express-admin-almacen.html')
+    e.request.url.includes('north-express-motorizado.html') ||
+    e.request.url.includes('north-express-tienda.html') ||
+    e.request.url.includes('north-express-admin-almacen.html')
   ) {
     e.respondWith(
       fetch(e.request)

@@ -2,7 +2,7 @@
   "name": "North Express · Repartidor",
   "short_name": "NX Repartidor",
   "description": "App de repartidor para North Express Delivery",
-  "start_url": "/expreso-norte/norte-expreso-motorizado.html",
+  "start_url": "/north-express/north-express/north-express-motorizado.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0a0f",
@@ -10,13 +10,13 @@
   "lang": "es",
   "icons": [
     {
-      "src": "/expreso-norte/icono-192.png",
+      "src": "/north-express/north-express/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/expreso-norte/icono-512.png",
+      "src": "/north-express/north-express/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -25,7 +25,7 @@
   "shortcuts": [
     {
       "name": "Mis Pedidos",
-      "url": "/expreso-norte/norte-expreso-motorizado.html",
+      "url": "/north-express/north-express/north-express-motorizado.html",
       "description": "Ver pedidos del día"
     }
   ]
