@@ -3682,15 +3682,33 @@ function seleccionarPago(tipo, pedidoIdx){
     bTi.style.background='rgba(108,31,201,.1)';bTi.style.borderColor='rgba(108,31,201,.2)';bTi.style.transform='scale(1)';
     if(yapeInline) yapeInline.style.display='none';
     cerrarYapePanel();
+    // Efectivo: habilitar confirmar directamente
+    const btn=document.getElementById('btn-confirmar-entrega');
+    btn.style.opacity='1';btn.style.pointerEvents='auto';
+    btn.style.background='var(--jade)';
   }else{
     bTi.style.background='rgba(108,31,201,.35)';bTi.style.borderColor='#a855f7';bTi.style.transform='scale(1.03)';
     bEf.style.background='rgba(0,184,122,.08)';bEf.style.borderColor='rgba(0,184,122,.2)';bEf.style.transform='scale(1)';
     // Mostrar QR inline en vez del panel lateral
     if(yapeInline) yapeInline.style.display='block';
+    // Yape: bloquear confirmar hasta que haya foto de comprobante
+    const btn=document.getElementById('btn-confirmar-entrega');
+    const yaHayFoto=(window._fotosEntrega||[]).length>0;
+    btn.style.opacity=yaHayFoto?'1':'0.35';
+    btn.style.pointerEvents=yaHayFoto?'auto':'none';
+    btn.style.background='var(--jade)';
+    // Mostrar aviso de comprobante obligatorio
+    let avisoYape=document.getElementById('aviso-yape-comprobante');
+    if(!avisoYape){
+      avisoYape=document.createElement('div');
+      avisoYape.id='aviso-yape-comprobante';
+      avisoYape.style.cssText='background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.4);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#c084fc;display:flex;align-items:center;gap:8px;';
+      avisoYape.innerHTML='📷 <strong>Sube el comprobante del Yape</strong> para poder confirmar la entrega';
+      const grid=document.getElementById('entrega-fotos-grid');
+      if(grid&&grid.parentElement) grid.parentElement.insertBefore(avisoYape,grid.parentElement.firstChild);
+    }
+    avisoYape.style.display='flex';
   }
-  const btn=document.getElementById('btn-confirmar-entrega');
-  btn.style.opacity='1';btn.style.pointerEvents='auto';
-  btn.style.background='var(--jade)';
 }
 
 function agregarFotosEntrega(input,idx){
@@ -3717,6 +3735,13 @@ function agregarFotosEntrega(input,idx){
       wrap.appendChild(badge);
       const label=grid.querySelector('label');
       grid.insertBefore(wrap,label);
+      // Si es pago tienda, habilitar el botón CONFIRMAR al subir la primera foto
+      if(pago==='tienda'){
+        const btn=document.getElementById('btn-confirmar-entrega');
+        if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}
+        const aviso=document.getElementById('aviso-yape-comprobante');
+        if(aviso) aviso.style.display='none';
+      }
     };
     r.readAsDataURL(f);
   });
@@ -3753,6 +3778,13 @@ function finalizarEntregaFinal(idx){
   if(!pago){toast('⚠️ Selecciona cómo pagó el cliente');return;}
   const obs=document.getElementById('entrega-obs')?.value?.trim()||'';
   const fotos=window._fotosEntrega||[];
+  // Si el pago fue con Yape (tienda), exigir foto de comprobante
+  if(pago==='tienda'&&fotos.length===0){
+    toast('📷 Debes subir el comprobante del Yape para confirmar');
+    const label=document.querySelector('#entrega-fotos-grid label');
+    if(label){label.style.borderColor='#a855f7';label.style.animation='pulse 1s infinite';}
+    return;
+  }
   // Si no hay internet, encolar el cambio y actualizar UI localmente
   if(!navigator.onLine){
     encolarCambioOffline(idx,'ENTREGADO',{pagoTipo:pago,postobs:obs});
@@ -8700,6 +8732,29 @@ function tiendaLiqRenderResumen(){
   if(el('tienda-liq-env-count')) el('tienda-liq-env-count').textContent=`${calc.envCount} envíos`;
   if(el('tienda-liq-env-monto')) el('tienda-liq-env-monto').textContent=`S/ ${calc.envMonto.toFixed(2)}`;
   if(el('tienda-liq-total')) el('tienda-liq-total').textContent=`S/ ${calc.total.toFixed(2)}`;
+
+  // Calcular monto recibido vía Yape (cobrado directamente por la tienda)
+  const todosLosPedidos = (typeof pedidos !== 'undefined' && pedidos.length)
+    ? pedidos : JSON.parse(localStorage.getItem('nx_pedidos')||'[]');
+  const pedsTiendaDia = todosLosPedidos.filter(p=>{
+    const fecha=(p.fecha||'').slice(0,10);
+    return (p.tienda||'').toUpperCase()===nombre.toUpperCase() && fecha===tiendaLiqDiaActual;
+  });
+  const pedidosYape = pedsTiendaDia.filter(p=>p.estado==='ENTREGADO'&&p.pagoTipo==='tienda');
+  const montoYape = pedidosYape.reduce((s,p)=>s+parseFloat(p.cobrar||0),0);
+  let yapeRow = el('tienda-liq-yape-row');
+  if(!yapeRow){
+    yapeRow=document.createElement('div');
+    yapeRow.id='tienda-liq-yape-row';
+    yapeRow.className='liq-row';
+    yapeRow.style.cssText='border-top:2px solid var(--border);margin-top:8px;padding-top:12px;';
+    yapeRow.innerHTML='<span class=\'lbl\'>💜 Cobrado vía Yape (debes a NX)</span><span class=\'val\' id=\'tienda-liq-yape-monto\' style=\'color:#a855f7\'>S/ 0.00</span>';
+    const liqBody=el('tienda-liq-ce-monto')?.closest('.liq-body');
+    if(liqBody) liqBody.appendChild(yapeRow);
+  }
+  const yapeMontoEl=el('tienda-liq-yape-monto');
+  if(yapeMontoEl) yapeMontoEl.textContent=`S/ ${montoYape.toFixed(2)}`;
+  if(yapeRow) yapeRow.style.display=pedidosYape.length?'flex':'none';
 
   // Estado comprobante
   const data = liqCargar();
