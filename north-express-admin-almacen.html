@@ -6,7 +6,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -570,27 +569,6 @@ tbody tr:hover{background:#fafaf7;}
 #role-selector .role-card:nth-child(2),
 #role-selector .role-card:nth-child(3){display:none!important;}
 
-
-/* ══ NX CONFIRM MODAL ══ */
-#nx-confirm-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,15,.75);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
-#nx-confirm-overlay.open{display:flex;}
-#nx-confirm-box{background:#fff;border-radius:20px;width:100%;max-width:360px;box-shadow:0 32px 80px rgba(0,0,0,.35);animation:nxConfirmPop .22s cubic-bezier(.34,1.56,.64,1);overflow:hidden;}
-@keyframes nxConfirmPop{from{opacity:0;transform:scale(.88) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
-#nx-confirm-box .nxc-stripe{height:4px;background:var(--rose);transition:background .2s;}
-#nx-confirm-box.warning .nxc-stripe{background:var(--amber);}
-#nx-confirm-box .nxc-icon{font-size:40px;text-align:center;padding:24px 24px 0;line-height:1;}
-#nx-confirm-box .nxc-title{font-family:var(--display);font-size:22px;letter-spacing:1.5px;color:var(--ink);text-align:center;padding:10px 24px 4px;}
-#nx-confirm-box .nxc-msg{font-size:13px;color:var(--muted);text-align:center;padding:0 24px 20px;line-height:1.55;}
-#nx-confirm-box .nxc-detail{background:var(--smoke);border:1px solid var(--border);border-radius:10px;margin:0 24px 20px;padding:9px 14px;font-family:var(--mono);font-size:12px;color:var(--ink2);text-align:center;word-break:break-word;}
-#nx-confirm-box .nxc-actions{display:flex;gap:8px;padding:0 24px 24px;}
-#nx-confirm-box .nxc-btn{flex:1;padding:12px;border-radius:12px;border:none;font-family:var(--body);font-size:13px;font-weight:700;cursor:pointer;transition:all .18s;}
-#nx-confirm-box .nxc-cancel{background:var(--smoke2);color:var(--muted);}
-#nx-confirm-box .nxc-cancel:hover{background:var(--border);color:var(--ink);}
-#nx-confirm-box .nxc-ok{background:var(--rose);color:#fff;}
-#nx-confirm-box .nxc-ok:hover{background:#d42e50;transform:translateY(-1px);box-shadow:0 6px 18px rgba(232,58,90,.35);}
-#nx-confirm-box.warning .nxc-ok{background:var(--amber);color:var(--ink);}
-#nx-confirm-box.warning .nxc-ok:hover{background:var(--amber2);box-shadow:0 6px 18px rgba(240,165,0,.35);}
-
 </style>
 </head>
 <body>
@@ -792,7 +770,7 @@ tbody tr:hover{background:#fafaf7;}
   <!-- ── TAB TIENDAS ── -->
   <div id="atab-tiendas" class="page" style="display:none">
     <div class="ph">
-      <div><div class="ph-title">TIENDAS & YAPE</div><div class="ph-sub">Configura número y código QR Yape por tienda</div></div>
+      <div><div class="ph-title">TIENDAS & YAPE</div><div class="ph-sub">Información de pago registrada por cada tienda · Solo lectura</div></div>
       <button class="btn btn-amber" onclick="abrirModalTienda()">+ Nueva Tienda</button>
     </div>
     <div id="tiendas-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px"></div>
@@ -921,7 +899,7 @@ tbody tr:hover{background:#fafaf7;}
       <div><div class="ph-title">HISTORIAL & ESTADÍSTICAS</div><div class="ph-sub">Resumen acumulado por fecha</div></div>
       <div class="ph-actions">
         <button class="btn btn-ghost" onclick="exportarHistorialExcel()">📊 Exportar Excel</button>
-        <button class="btn btn-rose btn-sm" onclick="archivarDia()">📦 Archivar día</button>
+        <button class="btn btn-rose btn-sm" onclick="if(confirm('¿Archivar el día actual y limpiar la operación?'))archivarDia()">📦 Archivar día</button>
       </div>
     </div>
     <div id="historial-content"></div>
@@ -1211,7 +1189,7 @@ tbody tr:hover{background:#fafaf7;}
     <div class="login-card">
       <h2>ACCESO</h2>
       <p>Ingresa tus credenciales para ver tus pedidos del día.</p>
-      <div class="lf"><label>Nombre de tienda</label><input type="text" id="login-tienda" placeholder="Nombre de tu tienda"></div>
+      <div class="lf"><label>Nombre de tienda</label><input type="text" id="login-tienda" placeholder="Ej: IFYS"></div>
       <div class="lf"><label>Contraseña</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginTienda()"></div>
       <button class="btn btn-dark" style="width:100%;justify-content:center;margin-top:6px;font-size:14px" onclick="loginTienda()">Ingresar →</button>
       <p style="margin-top:16px;font-size:11px;text-align:center;color:var(--muted)"></p>
@@ -1955,7 +1933,7 @@ tbody tr:hover{background:#fafaf7;}
       <div class="fl"><label>Producto</label><input type="text" id="f-producto"></div>
       <div class="fl"><label>Unidades</label><input type="number" id="f-unidades" value="1" min="1"></div>
       <div class="fl"><label>Cobrar (S/)</label><input type="number" id="f-cobrar" step="0.01" oninput="calcAbonar()"></div>
-      <div class="fl"><label>Delivery (S/) — editable por admin</label><input type="number" id="f-delivery" value="12" step="0.01" min="0" oninput="calcAbonar()" style="font-family:var(--mono);font-weight:600"></div>
+      <div class="fl"><label>Delivery — fijo S/12</label><input type="number" id="f-delivery" value="12" readonly style="background:var(--smoke2);color:var(--muted)"></div>
       <div class="fl"><label>Abonar a tienda</label><input type="text" id="f-abonar" readonly style="background:var(--smoke2);font-family:var(--mono);font-weight:600"></div>
       <div class="fl"><label>Estado</label>
         <select id="f-estado"><option>CONFIRMADO</option><option>EN RUTA</option><option>ENTREGADO</option><option>NO CONTESTA</option><option>REPROGRAMADO</option><option>RECHAZADO EN PUNTO</option></select>
@@ -2417,14 +2395,17 @@ function guardarDatos(){
 async function _fbGuardarNube(){
   if(!_fbDb) return;
   try{
-    // Admin solo actualiza datos globales compartidos — nunca sobreescribe pedidos por tienda
+    const pedidosSinFotos=pedidos.map(p=>({...p,fotos:[]}));
+    // Usar update() en lugar de set() para no pisar datos de otros módulos
     await _fbDb.ref('datos').update({
+      pedidos:      pedidosSinFotos,
       repartidores: repartidores,
       tiendas:      tiendas,
       inventario:   inventario,
       despachos:    despachos,
       tsGuardado:   Date.now(),
     });
+    // Indicador verde en topbar
     const dot = document.getElementById('fb-sync-dot');
     if(dot){ dot.style.background='#4dffc0'; dot.title='Firebase sincronizado ✅'; }
   }catch(e){
@@ -2440,21 +2421,12 @@ async function _fbCargarNube(){
     const snap = await _fbDb.ref('datos').once('value');
     const data = snap.val();
     if(!data) return false;
+    if(Array.isArray(data.pedidos)&&data.pedidos.length>0) pedidos=data.pedidos;
     if(Array.isArray(data.repartidores)&&data.repartidores.length>0) repartidores=data.repartidores;
     if(Array.isArray(data.tiendas)&&data.tiendas.length>0) tiendas=data.tiendas;
     if(Array.isArray(data.inventario)&&data.inventario.length>0) inventario=data.inventario;
     if(Array.isArray(data.despachos)) despachos=data.despachos;
-    // Fusionar pedidos de todos los nodos por tienda
-    const snapAll=await _fbDb.ref('pedidos_tiendas').once('value');
-    const allNodes=snapAll.val()||{};
-    let todosPedidos=[],todosEnvios=[];
-    Object.values(allNodes).forEach(n=>{ if(Array.isArray(n.pedidos)) todosPedidos=todosPedidos.concat(n.pedidos); if(Array.isArray(n.enviosAgencia)) todosEnvios=todosEnvios.concat(n.enviosAgencia); });
-    if(todosPedidos.length>0) pedidos=todosPedidos;
-    else if(Array.isArray(data.pedidos)&&data.pedidos.length>0) pedidos=data.pedidos; // fallback legado
-    if(todosEnvios.length>0){ enviosAgencia=todosEnvios; guardarEnviosAgencia(); enviosAgencia.forEach(e=>_enviosAgenciaKnownIds.add(e.id||e.cod||JSON.stringify(e))); }
-    console.info('✅ Datos cargados desde Firebase ('+pedidos.length+' pedidos)');
-    // Cargar fotos de pedidos desde ruta separada
-    await _fbCargarFotosPedidos();
+    console.info('✅ Datos cargados desde Firebase ('+(data.pedidos||[]).length+' pedidos)');
     return true;
   }catch(e){
     console.warn('Firebase load error:', e);
@@ -2462,48 +2434,21 @@ async function _fbCargarNube(){
   }
 }
 
-// Cargar fotos de pedidos desde Firebase y fusionarlas en memoria
-async function _fbCargarFotosPedidos(){
-  if(!_fbDb) return;
-  try{
-    const snap = await _fbDb.ref('pedidos_fotos').once('value');
-    const fotosFB = snap.val() || {};
-    pedidos.forEach(p => {
-      if(!p.cod) return;
-      const key = p.cod.replace(/[^a-zA-Z0-9_-]/g,'_');
-      if(fotosFB[key] && fotosFB[key].length){
-        p.fotos = fotosFB[key];
-      }
-    });
-  }catch(e){ console.warn('[FOTOS] Error cargando fotos pedidos:',e); }
-}
-
 // Escuchar cambios en tiempo real (para sincronizar entre admin y otros roles)
 let _fbListenerActivo = false;
 function _fbEscucharCambios(){
   if(!_fbDb||_fbListenerActivo) return;
   _fbListenerActivo = true;
-  // Datos globales compartidos
   _fbDb.ref('datos').on('value', snap=>{
     const data = snap.val();
     if(!data) return;
+    if(Array.isArray(data.pedidos)&&data.pedidos.length>0) pedidos=data.pedidos;
     if(Array.isArray(data.repartidores)&&data.repartidores.length>0) repartidores=data.repartidores;
     if(Array.isArray(data.tiendas)&&data.tiendas.length>0) tiendas=data.tiendas;
     if(Array.isArray(data.inventario)&&data.inventario.length>0) inventario=data.inventario;
     if(Array.isArray(data.despachos)) despachos=data.despachos;
+    renderAll();
     const dot = document.getElementById('fb-sync-dot');
-    if(dot){ dot.style.background='#4dffc0'; }
-  });
-  // Admin escucha todos los nodos de tiendas y fusiona en tiempo real
-  _fbDb.ref('pedidos_tiendas').on('value', snap=>{
-    const allNodes=snap.val()||{};
-    let todosPedidos=[],todosEnvios=[];
-    Object.values(allNodes).forEach(n=>{ if(Array.isArray(n.pedidos)) todosPedidos=todosPedidos.concat(n.pedidos); if(Array.isArray(n.enviosAgencia)) todosEnvios=todosEnvios.concat(n.enviosAgencia); });
-    if(todosPedidos.length>0) pedidos=todosPedidos;
-    if(todosEnvios.length>0){ enviosAgencia=todosEnvios; guardarEnviosAgencia(); checkNotifEnvios(); renderAlmEnvios(); }
-    // Fusionar fotos y luego renderizar
-    _fbCargarFotosPedidos().then(()=>{ renderAll(); });
-    const dot=document.getElementById('fb-sync-dot');
     if(dot){ dot.style.background='#4dffc0'; }
   });
 }
@@ -2573,9 +2518,7 @@ function guardarYRenderRepCards(){guardarDatos();renderRepCards();}
 // ═══════════════════════════════════════
 // ARCHIVAR DÍA (historial)
 // ═══════════════════════════════════════
-async function archivarDia(){
-  const ok=await nxConfirm({title:'¿ARCHIVAR DÍA?',msg:'Se guardará el historial y se limpiarán todos los pedidos activos.',icon:'📦',okLabel:'Archivar y limpiar',type:'warning'});
-  if(!ok)return;
+function archivarDia(){
   const fecha=new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'});
   const fechaISO=new Date().toISOString().slice(0,10);
   const hist=cargarHistorial();
@@ -2715,7 +2658,7 @@ function entrar(role){
 
 function doAdminLogin(){
   const pin=document.getElementById('admin-pin-inp').value;
-  // Contraseña configurable — definida en configuración
+  // Contraseña configurable — por defecto "admin123"
   const adminPass=localStorage.getItem('nx-admin-pass')||'admin123';
   if(pin===adminPass){
     document.getElementById('admin-login-overlay')?.remove();
@@ -4206,14 +4149,13 @@ function toggleRepartidor(id){
   renderRepCards();
   toast(rep.activo===false?`🔒 ${rep.nombre} bloqueado`:`✅ ${rep.nombre} activado`);
 }
-async function eliminarRepartidor(id){
+function eliminarRepartidor(id){
   const rep=repartidores.find(r=>r.id===id);
-  const ok=await nxConfirm({title:'¿ELIMINAR MOTORIZADO?',msg:'Sus pedidos asignados quedarán sin repartidor.',detail:rep?.nombre||id,icon:'🏍',okLabel:'Eliminar',type:'danger'});
-  if(!ok)return;
+  if(!confirm(`¿Eliminar a ${rep.nombre}? Sus pedidos quedarán sin asignar.`))return;
   pedidos.forEach(p=>{if(p.repartidorId===id)p.repartidorId=null;});
   repartidores=repartidores.filter(r=>r.id!==id);
   guardarDatos();
-  renderRepCards();renderAll();
+  renderRepCards(); renderAll();
   toast('🗑 Repartidor eliminado');
 }
 
@@ -4847,7 +4789,7 @@ function abrirModal(idx=-1){
 }
 function editarPedido(idx){abrirModal(idx);}
 function cerrarModal(){document.getElementById('modal-overlay').classList.remove('open');}
-function calcAbonar(){const c=parseFloat(document.getElementById('f-cobrar').value)||0;const d=parseFloat(document.getElementById('f-delivery').value)||12;document.getElementById('f-abonar').value='S/ '+(c-d).toFixed(2);}
+function calcAbonar(){const c=parseFloat(document.getElementById('f-cobrar').value)||0;document.getElementById('f-abonar').value='S/ '+(c-12).toFixed(2);}
 function previewMapa(){
   const dir=document.getElementById('f-direccion').value;
   const wrap=document.getElementById('mapa-preview-wrap');
@@ -4874,7 +4816,7 @@ function guardarPedido(){
     referencia:document.getElementById('f-referencia').value,distrito:document.getElementById('f-distrito').value,
     celular:document.getElementById('f-celular').value,obs:document.getElementById('f-obs').value,
     producto:document.getElementById('f-producto').value,unidades:parseInt(document.getElementById('f-unidades').value)||1,
-    cobrar,delivery:parseFloat(document.getElementById('f-delivery').value)||12,abonar:cobrar-(parseFloat(document.getElementById('f-delivery').value)||12),
+    cobrar,delivery:12,abonar:cobrar-12,
     estado:document.getElementById('f-estado').value,
     postobs:document.getElementById('f-postobs').value,
     fotos:[...fotosTemp],
@@ -4895,12 +4837,7 @@ function guardarPedido(){
   cerrarModal();guardarDatos();renderAll();
   toast(idx===-1?`✅ ${p.cod} creado`:`✏️ ${p.cod} actualizado`);
 }
-async function eliminarPedido(idx){
-  const p=pedidos[idx];
-  const ok=await nxConfirm({title:'¿ELIMINAR PEDIDO?',msg:'Se borrará el pedido de forma permanente.',detail:`${p.cod} · ${p.nombre}`,icon:'📦',okLabel:'Eliminar',type:'danger'});
-  if(!ok)return;
-  pedidos.splice(idx,1);guardarDatos();renderAll();toast('🗑 Pedido eliminado');
-}
+function eliminarPedido(idx){if(!confirm(`¿Eliminar ${pedidos[idx].cod}?`))return;pedidos.splice(idx,1);guardarDatos();renderAll();toast('🗑 Pedido eliminado');}
 
 // ═══════════════════════════════════════
 // DETALLE (mapa + fotos)
@@ -5010,11 +4947,9 @@ function agregarFotoDet(input){
   });
   input.value='';toast('📷 Foto agregada');
 }
-async function eliminarFotoDet(pidx,fidx){
+function eliminarFotoDet(pidx,fidx){
   const f=pedidos[pidx].fotos[fidx];
-  const ok=await nxConfirm({title:'¿ELIMINAR FOTO?',msg:'La imagen se borrará del pedido de forma permanente.',detail:f?.nombre||'Foto sin nombre',icon:'🖼',okLabel:'Eliminar foto',type:'danger'});
-  if(!ok)return;
-  logAccion(pidx,'Foto eliminada',`Archivo: ${f?.nombre||'sin nombre'}`);
+  logAccion(pidx,'Foto eliminada',`Archivo: ${f.nombre||'sin nombre'}`);
   pedidos[pidx].fotos.splice(fidx,1);
   guardarDatos();abrirDetalle(pidx);renderTabla();
 }
@@ -5210,7 +5145,7 @@ function tUpProcesar(filas){
     if(!cobrar) cobrar = parseMoney(f[9+off])||0;
     return{cod:("TUP-"+Date.now().toString(36).slice(-4)).toUpperCase(),tienda:tiendaActual,
       nombre,direccion,referencia,distrito,celular,obs,producto,unidades,
-      cobrar,delivery:parseFloat(document.getElementById('f-delivery').value)||12,abonar:cobrar-(parseFloat(document.getElementById('f-delivery').value)||12),estado:"CONFIRMADO",postobs:"",fotos:[],
+      cobrar,delivery:12,abonar:cobrar-12,estado:"CONFIRMADO",postobs:"",fotos:[],
       lat:null,lng:null,repartidorId:null,fecha:new Date().toISOString().slice(0,10),_nuevo:true};
   });
   tUpRenderPreview();
@@ -5227,7 +5162,7 @@ function tUpAgregarManual(){
     nombre,direccion:dir,referencia:document.getElementById("tf-ref").value,distrito:dist,celular:cel,
     obs:document.getElementById("tf-obs").value,producto:prod,
     unidades:parseInt(document.getElementById("tf-und").value)||1,
-    cobrar,delivery:parseFloat(document.getElementById('f-delivery').value)||12,abonar:cobrar-(parseFloat(document.getElementById('f-delivery').value)||12),estado:"CONFIRMADO",postobs:"",fotos:[],
+    cobrar,delivery:12,abonar:cobrar-12,estado:"CONFIRMADO",postobs:"",fotos:[],
     lat:null,lng:null,repartidorId:null,_nuevo:true});
   ["tf-nombre","tf-dir","tf-ref","tf-dist","tf-cel","tf-prod","tf-obs"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("tf-und").value=1;document.getElementById("tf-cobrar").value="";
@@ -5512,11 +5447,9 @@ function renderHistorialDespachos(){
     </div>`;
 }
 
-async function eliminarDiaHistorial(idx){
+function eliminarDiaHistorial(idx){
+  if(!confirm('¿Eliminar este día del historial?'))return;
   const hist=cargarHistorial();
-  const dia=hist[hist.length-1-idx];
-  const ok=await nxConfirm({title:'¿ELIMINAR DÍA?',msg:'Se borrará este día del historial de forma permanente.',detail:dia?.fecha||'',icon:'📅',okLabel:'Eliminar día',type:'danger'});
-  if(!ok)return;
   hist.splice(idx,1);
   guardarHistorial(hist);
   renderHistorial();
@@ -5652,6 +5585,19 @@ function renderTiendasCards(){
     const nPedidos = pedidos.filter(p=>p.tienda===t.nombre).length;
     const hasQr = !!t.yapeQr;
     const hasNum = !!t.yapeNum;
+    let tsLabel = '';
+    if(t.cuentaActualizadoEn){
+      try{
+        const d = new Date(t.cuentaActualizadoEn);
+        const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+        const dd = String(d.getDate()).padStart(2,'0');
+        const mm = String(d.getMonth()+1).padStart(2,'0');
+        const yy = d.getFullYear();
+        const hh = String(d.getHours()).padStart(2,'0');
+        const min = String(d.getMinutes()).padStart(2,'0');
+        tsLabel = `${dias[d.getDay()]} ${dd}/${mm}/${yy} · ${hh}:${min}`;
+      }catch(e){}
+    }
     return `
     <div style="background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden">
       <div style="background:var(--ink);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
@@ -5659,41 +5605,49 @@ function renderTiendasCards(){
           <div style="font-family:var(--display);font-size:22px;letter-spacing:2px;color:#fff">${t.nombre}</div>
           <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">${nPedidos} pedido${nPedidos!==1?'s':''} hoy</div>
         </div>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.15)" onclick="editarTienda(${i})">✏️ Editar</button>
-          <button class="btn btn-xs" style="background:var(--rose-pale);color:var(--rose)" onclick="eliminarTienda(${i})">✕</button>
-        </div>
+        <button class="btn btn-xs" style="background:var(--rose-pale);color:var(--rose)" onclick="eliminarTienda(${i})">✕</button>
       </div>
       <div style="padding:16px 20px">
-        <div style="display:flex;gap:14px;align-items:center">
-          <div style="flex-shrink:0">
-            ${hasQr
-              ? `<img src="${t.yapeQr}" style="width:80px;height:80px;border-radius:10px;object-fit:cover;border:2px solid #6c1fc9">`
-              : `<div style="width:80px;height:80px;border-radius:10px;background:var(--smoke2);border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:20px;color:var(--muted)">📷<span style="font-size:9px;margin-top:3px">Sin QR</span></div>`
-            }
-          </div>
-          <div style="flex:1">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:3px">Número Yape</div>
-            <div style="font-family:var(--mono);font-size:20px;font-weight:600;color:${hasNum?'#6c1fc9':'var(--muted)'}">${hasNum ? t.yapeNum : '— No configurado'}</div>
-            ${t.obs?`<div style="font-size:11px;color:var(--muted);margin-top:4px">${t.obs}</div>`:''}
+
+        <!-- YAPE -->
+        <div style="margin-bottom:14px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6c1fc9;margin-bottom:10px">💜 Yape</div>
+          <div style="display:flex;gap:14px;align-items:center">
+            <div style="flex-shrink:0">
+              ${hasQr
+                ? `<img src="${t.yapeQr}" style="width:80px;height:80px;border-radius:10px;object-fit:cover;border:2px solid #6c1fc9">`
+                : `<div style="width:80px;height:80px;border-radius:10px;background:var(--smoke2);border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:20px;color:var(--muted)">📷<span style="font-size:9px;margin-top:3px">Sin QR</span></div>`
+              }
+            </div>
+            <div style="flex:1">
+              ${t.yapeNombre ? `<div style="font-weight:700;color:var(--ink);font-size:13px;margin-bottom:2px">👤 ${t.yapeNombre}</div>` : ''}
+              <div style="font-family:var(--mono);font-size:20px;font-weight:600;color:${hasNum?'#6c1fc9':'var(--muted)'};">${hasNum ? t.yapeNum : '— No configurado'}</div>
+              <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+                ${hasQr&&hasNum
+                  ? `<span style="background:var(--jade-pale);color:var(--jade);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px">✅ Completo</span>`
+                  : hasNum
+                  ? `<span style="background:var(--amber-pale);color:var(--tangerine);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px">⚠️ Falta QR</span>`
+                  : `<span style="background:var(--rose-pale);color:var(--rose);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px">❌ Sin configurar</span>`
+                }
+              </div>
+            </div>
           </div>
         </div>
-        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--smoke2);display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-          <span style="font-size:11px;color:var(--muted)">Yape:</span>
-          ${hasQr&&hasNum
-            ? `<span style="background:var(--jade-pale);color:var(--jade);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px">✅ Completo</span>`
-            : hasNum
-            ? `<span style="background:var(--amber-pale);color:var(--tangerine);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px">⚠️ Falta QR</span>`
-            : `<span style="background:var(--rose-pale);color:var(--rose);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px">❌ Sin configurar</span>`
-          }
-          ${t.banco?`<span style="background:var(--sky-pale);color:var(--sky);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px">🏦 ${t.banco}</span>`:''}
-        </div>
-        ${t.cuentaNro||t.cuentaCci?`
-        <div style="margin-top:10px;padding:10px 14px;background:var(--smoke);border-radius:10px;font-size:12px">
-          ${t.cuentaTitular?`<div style="font-weight:700;color:var(--ink);margin-bottom:4px">${t.cuentaTitular}</div>`:''}
-          ${t.cuentaNro?`<div style="color:var(--muted)">Cta: <span style="font-family:var(--mono);color:var(--ink)">${t.cuentaNro}</span></div>`:''}
-          ${t.cuentaCci?`<div style="color:var(--muted)">CCI: <span style="font-family:var(--mono);color:var(--ink)">${t.cuentaCci}</span></div>`:''}
-        </div>`:''}
+
+        <!-- CUENTA BANCARIA -->
+        ${t.banco||t.cuentaNro||t.cuentaCci ? `
+        <div style="border-top:1px solid var(--smoke2);padding-top:12px;margin-top:4px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sky);margin-bottom:8px">🏦 Cuenta Bancaria</div>
+          <div style="background:var(--smoke);border-radius:10px;padding:10px 14px;font-size:12px">
+            ${t.banco ? `<div style="margin-bottom:6px"><span style="background:var(--sky-pale);color:var(--sky);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px">${t.banco}</span></div>` : ''}
+            ${t.cuentaTitular ? `<div style="font-weight:700;color:var(--ink);margin-bottom:4px">${t.cuentaTitular}</div>` : ''}
+            ${t.cuentaNro ? `<div style="color:var(--muted)">Cta: <span style="font-family:var(--mono);color:var(--ink)">${t.cuentaNro}</span></div>` : ''}
+            ${t.cuentaCci ? `<div style="color:var(--muted)">CCI: <span style="font-family:var(--mono);color:var(--ink)">${t.cuentaCci}</span></div>` : ''}
+          </div>
+        </div>` : ''}
+
+        <!-- TIMESTAMP -->
+        ${tsLabel ? `<div style="margin-top:10px;font-size:10px;color:var(--muted);text-align:right">🕐 Actualizado por la tienda: ${tsLabel}</div>` : '<div style="margin-top:10px;font-size:10px;color:var(--muted);text-align:right;font-style:italic">Sin datos ingresados aún</div>'}
       </div>
     </div>`;
   }).join('');
@@ -5804,9 +5758,8 @@ async function guardarTienda(){
   renderTiendasCards();
 }
 
-async function eliminarTienda(i){
-  const ok=await nxConfirm({title:'¿ELIMINAR TIENDA?',msg:'Se perderá toda la configuración de la tienda.',detail:tiendas[i]?.nombre,icon:'🏪',okLabel:'Eliminar tienda',type:'danger'});
-  if(!ok)return;
+function eliminarTienda(i){
+  if(!confirm(`¿Eliminar la tienda "${tiendas[i].nombre}"?`)) return;
   tiendas.splice(i,1);
   guardarDatos();
   renderTiendasCards();
@@ -6156,10 +6109,9 @@ function guardarProducto(){
   renderInventario();
 }
 
-async function eliminarProducto(id){
+function eliminarProducto(id){
   const p=inventario.find(x=>x.id===id);
-  const ok=await nxConfirm({title:'¿ELIMINAR PRODUCTO?',msg:'Se quitará del inventario de forma permanente.',detail:p?.nombre,icon:'📦',okLabel:'Eliminar',type:'danger'});
-  if(!ok)return;
+  if(!confirm(`¿Eliminar "${p?.nombre}" del inventario?`)) return;
   inventario=inventario.filter(x=>x.id!==id);
   guardarDatos();
   renderInventario();
@@ -6266,7 +6218,7 @@ function renderEnvios(){
   el.innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
       <div style="font-size:13px;color:var(--muted)">${envios.length} envío(s) cargado(s)</div>
-      <button class="btn btn-rose btn-sm" onclick="limpiarTodosEnvios()">🗑 Limpiar todo</button>
+      <button class="btn btn-rose btn-sm" onclick="if(confirm('¿Limpiar todos los envíos?')){envios=[];guardarEnvios();renderEnvios();}">🗑 Limpiar todo</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">
       ${envios.map((e,i)=>`
@@ -6368,14 +6320,10 @@ function guardarNuevoEnvio(){
   toast('✅ Envío agregado');
 }
 
-async function eliminarEnvio(i){
-  const e=envios[i];
-  const ok=await nxConfirm({title:'¿ELIMINAR ENVÍO?',msg:'Se borrará este envío del listado.',detail:e?`${e.cod||''} · ${e.nombre||''}`.trim().replace(/^·\s*/,''):'',icon:'🗑',okLabel:'Eliminar',type:'danger'});
-  if(!ok)return;
+function eliminarEnvio(i){
   envios.splice(i,1);
   guardarEnvios();
   renderEnvios();
-  toast('🗑 Envío eliminado');
 }
 
 // ── IMPRIMIR RÓTULOS ──────────────────────────
@@ -7306,10 +7254,8 @@ function agregarItemDespacho(){
 
 // guardarDespacho (versión antigua eliminada - usar la de abajo)
 
-async function eliminarDespacho(id){
-  const d=despachos.find(x=>x.id===id);
-  const ok=await nxConfirm({title:'¿ELIMINAR DESPACHO?',msg:'Se borrará el despacho del motorizado asignado.',detail:d?`${d.repNombre||''} · ${d.items?.length||0} ítem(s)`:'',icon:'📋',okLabel:'Eliminar',type:'danger'});
-  if(!ok)return;
+function eliminarDespacho(id){
+  if(!confirm('¿Eliminar este despacho?')) return;
   despachos=despachos.filter(d=>d.id!==id);
   guardarDatos();
   renderAlmacen();
@@ -7508,7 +7454,7 @@ function renderAdminDespachos(){
           style="background:rgba(160,100,255,.1);color:#a064ff;border:1px solid rgba(160,100,255,.3);border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;margin-left:8px">
           📋 Ver detalle
         </button>
-        <button onclick="eliminarDespachoInline('${d.id}')"
+        <button onclick="if(confirm('¿Eliminar este despacho?')){despachos=despachos.filter(x=>x.id!=='${d.id}');guardarDatos();renderAdminDespachos();toast('🗑 Eliminado')}"
           style="background:var(--rose-pale);color:var(--rose);border:none;border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer;margin-left:4px">✕</button>
       </div>
       <div style="padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -7544,11 +7490,10 @@ function exportarDespachosExcel(){
   toast('📊 Despachos exportados en Excel');
 }
 
-async function limpiarDespachosConfirmados(){
+function limpiarDespachosConfirmados(){
   const n=despachos.filter(d=>d.estado==='confirmado').length;
   if(!n){toast('⚠️ No hay despachos confirmados');return;}
-  const ok=await nxConfirm({title:'¿LIMPIAR CONFIRMADOS?',msg:`Se eliminarán ${n} despacho(s) ya confirmados. No se puede deshacer.`,icon:'🧹',okLabel:`Limpiar ${n} despacho(s)`,type:'warning'});
-  if(!ok)return;
+  if(!confirm(`¿Limpiar ${n} despacho(s) confirmado(s)? Esta acción no se puede deshacer.`)) return;
   despachos=despachos.filter(d=>d.estado!=='confirmado');
   guardarDatos();
   renderAdminDespachos();
@@ -7605,9 +7550,8 @@ function agregarUsuarioAlmacen(){
   toast(`✅ Usuario "${u}" agregado`);
 }
 
-async function eliminarUsuarioAlmacen(u){
-  const ok=await nxConfirm({title:'¿ELIMINAR USUARIO?',msg:'El usuario perderá acceso al almacén inmediatamente.',detail:u,icon:'👤',okLabel:'Eliminar usuario',type:'danger'});
-  if(!ok)return;
+function eliminarUsuarioAlmacen(u){
+  if(!confirm(`¿Eliminar el usuario "${u}"?`)) return;
   const users=getAlmacenUsers();
   delete users[u];
   saveAlmacenUsers(users);
@@ -8088,113 +8032,16 @@ cargarEnviosAgencia();
 ══════════════════════════════════════════════════════════ */
 
 const LIQ_KEY  = 'nx_liquidaciones_v1';
-const COMISION_MOTO  = 10;   // S/ por pedido entregado
-const TARIFA_CE      = 12;   // S/ contraentrega (entregado + rechazado)
-const TARIFA_AGENCIA = 3;    // S/ por envío por agencia
+const COMISION_MOTO  = 10;   // S/ por pedido entregado  ⚠️ Si cambias este valor, actualízalo en los 3 archivos (tienda, motorizado, admin-almacen)
+const TARIFA_CE      = 12;   // S/ contraentrega (entregado + rechazado)  ⚠️ Si cambias este valor, actualízalo en los 3 archivos
+const TARIFA_AGENCIA = 3;    // S/ por envío por agencia  ⚠️ Si cambias este valor, actualízalo en los 3 archivos
 
 // ─── Storage helpers ───────────────────────────────────────
-let _liqCache = null;
-
 function liqCargar(){
-  if(_liqCache) return _liqCache;
   try{ return JSON.parse(localStorage.getItem(LIQ_KEY)||'{}'); }
   catch(e){ return {}; }
 }
-
-function liqGuardar(data){
-  _liqCache = data;
-  localStorage.setItem(LIQ_KEY, JSON.stringify(data));
-  if(_fbDb){
-    try{
-      const dataSinFotos = JSON.parse(JSON.stringify(data));
-      Object.keys(dataSinFotos).forEach(dia=>{
-        const motos = (dataSinFotos[dia]||{}).motos||{};
-        Object.keys(motos).forEach(nombre=>{
-          if(motos[nombre].fotoMoto){
-            _fbDb.ref(`liquidaciones_fotos/${dia}/motos/${nombre.replace(/\s/g,'_')}/fotoMoto`).set(motos[nombre].fotoMoto).catch(()=>{});
-            delete dataSinFotos[dia].motos[nombre].fotoMoto;
-          }
-          if(motos[nombre].fotoAdmin){
-            _fbDb.ref(`liquidaciones_fotos/${dia}/motos/${nombre.replace(/\s/g,'_')}/fotoAdmin`).set(motos[nombre].fotoAdmin).catch(()=>{});
-            delete dataSinFotos[dia].motos[nombre].fotoAdmin;
-          }
-          delete dataSinFotos[dia].motos[nombre].fotoMotoTemp;
-          delete dataSinFotos[dia].motos[nombre].fotoAdminTemp;
-        });
-        const tiendas = (dataSinFotos[dia]||{}).tiendas||{};
-        Object.keys(tiendas).forEach(nombre=>{
-          if(tiendas[nombre].fotoAdmin){
-            _fbDb.ref(`liquidaciones_fotos/${dia}/tiendas/${nombre.replace(/\s/g,'_')}/fotoAdmin`).set(tiendas[nombre].fotoAdmin).catch(()=>{});
-            delete dataSinFotos[dia].tiendas[nombre].fotoAdmin;
-          }
-          delete dataSinFotos[dia].tiendas[nombre].fotoAdminTemp;
-        });
-      });
-      _fbDb.ref('liquidaciones').set(dataSinFotos).catch(e=>console.warn('[LIQ] Firebase write error:',e));
-    }catch(e){ console.warn('[LIQ] Error sincronizando Firebase:',e); }
-  }
-}
-
-async function liqSincronizarDesdeFirebase(){
-  if(!_fbDb) return;
-  try{
-    const snapMeta = await _fbDb.ref('liquidaciones').once('value');
-    const metaFB = snapMeta.val() || {};
-    const snapFotos = await _fbDb.ref('liquidaciones_fotos').once('value');
-    const fotosFB = snapFotos.val() || {};
-    Object.keys(metaFB).forEach(dia=>{
-      const motos = (metaFB[dia]||{}).motos||{};
-      Object.keys(motos).forEach(nombre=>{
-        const key = nombre.replace(/\s/g,'_');
-        const fotos = ((fotosFB[dia]||{}).motos||{})[key]||{};
-        if(fotos.fotoMoto)  metaFB[dia].motos[nombre].fotoMoto  = fotos.fotoMoto;
-        if(fotos.fotoAdmin) metaFB[dia].motos[nombre].fotoAdmin = fotos.fotoAdmin;
-      });
-      const tiendas = (metaFB[dia]||{}).tiendas||{};
-      Object.keys(tiendas).forEach(nombre=>{
-        const key = nombre.replace(/\s/g,'_');
-        const fotos = ((fotosFB[dia]||{}).tiendas||{})[key]||{};
-        if(fotos.fotoAdmin) metaFB[dia].tiendas[nombre].fotoAdmin = fotos.fotoAdmin;
-      });
-    });
-    _liqCache = metaFB;
-    localStorage.setItem(LIQ_KEY, JSON.stringify(metaFB));
-    if(typeof adminLiqRender==='function') adminLiqRender();
-    if(typeof adminLiqActualizarBadges==='function') adminLiqActualizarBadges();
-  }catch(e){ console.warn('[LIQ] Error cargando desde Firebase:',e); }
-}
-
-function liqEscucharFirebase(){
-  if(!_fbDb || window._liqListenerActivo) return;
-  window._liqListenerActivo = true;
-  _fbDb.ref('liquidaciones').on('value', async snap=>{
-    const metaFB = snap.val();
-    if(!metaFB) return;
-    try{
-      const snapFotos = await _fbDb.ref('liquidaciones_fotos').once('value');
-      const fotosFB = snapFotos.val() || {};
-      Object.keys(metaFB).forEach(dia=>{
-        const motos = (metaFB[dia]||{}).motos||{};
-        Object.keys(motos).forEach(nombre=>{
-          const key = nombre.replace(/\s/g,'_');
-          const fotos = ((fotosFB[dia]||{}).motos||{})[key]||{};
-          if(fotos.fotoMoto)  metaFB[dia].motos[nombre].fotoMoto  = fotos.fotoMoto;
-          if(fotos.fotoAdmin) metaFB[dia].motos[nombre].fotoAdmin = fotos.fotoAdmin;
-        });
-        const tiendas = (metaFB[dia]||{}).tiendas||{};
-        Object.keys(tiendas).forEach(nombre=>{
-          const key = nombre.replace(/\s/g,'_');
-          const fotos = ((fotosFB[dia]||{}).tiendas||{})[key]||{};
-          if(fotos.fotoAdmin) metaFB[dia].tiendas[nombre].fotoAdmin = fotos.fotoAdmin;
-        });
-      });
-    }catch(e){}
-    _liqCache = metaFB;
-    localStorage.setItem(LIQ_KEY, JSON.stringify(metaFB));
-    if(typeof adminLiqRender==='function') adminLiqRender();
-    if(typeof adminLiqActualizarBadges==='function') adminLiqActualizarBadges();
-  });
-}
+function liqGuardar(data){ localStorage.setItem(LIQ_KEY, JSON.stringify(data)); }
 
 function liqGetDia(data, dia){ return data[dia] || { motos:{}, tiendas:{} }; }
 
@@ -8226,7 +8073,7 @@ function calcLiqMoto(repNombre, fechaDia){
   const dia = fechaDia || hoy();
 
   // Buscar el repartidor por nombre para obtener su ID
-  const reps = (typeof repartidores !== 'undefined' && repartidores.length) ? repartidores : JSON.parse(localStorage.getItem('nx_repartidores')||'[]');
+  const reps = (typeof repartidores !== 'undefined' && repartidores.length) ? repartidores : JSON.parse(localStorage.getItem('nx-repartidores')||'[]');
   const repObj = reps.find(r => (r.nombre||'').toUpperCase() === repNombre.toUpperCase());
   const repId = repObj ? repObj.id : null;
 
@@ -8258,13 +8105,13 @@ function calcLiqMoto(repNombre, fechaDia){
 
 // ─── Calcular liquidación tienda ──────────────────────────
 function calcLiqTienda(tiendaNombre, fechaDia){
-  const pedidos = (typeof pedidos !== 'undefined' && pedidos.length) ? pedidos : JSON.parse(localStorage.getItem('nx_pedidos')||'[]');
-  const envios = (typeof window.enviosAgencia !== 'undefined' && window.enviosAgencia.length)
+  const pedidosLiq = (window.pedidos && window.pedidos.length) ? window.pedidos : JSON.parse(localStorage.getItem('nx-pedidos')||localStorage.getItem('nx-pedidos')||'[]');
+  const envios = (window.enviosAgencia && window.enviosAgencia.length)
     ? window.enviosAgencia
-    : JSON.parse(localStorage.getItem('nx_envios_agencia')||'[]');
+    : JSON.parse(localStorage.getItem('nx-envios-agencia')||localStorage.getItem('nx-envios-agencia')||'[]');
   const dia = fechaDia || hoy();
 
-  const pedsTienda = pedidos.filter(p=>{
+  const pedsTienda = pedidosLiq.filter(p=>{
     const fecha=(p.fecha||'').slice(0,10);
     return (p.tienda||'').toUpperCase()===tiendaNombre.toUpperCase() && fecha===dia;
   });
@@ -8292,9 +8139,9 @@ function repLiqInit(){
                  (localStorage.getItem('nx_rep_nombre')||'').trim() || '';
 
   // Si hoy no tiene pedidos, auto-seleccionar el último día con pedidos
-  const todosLosPedidos = (typeof pedidos !== 'undefined' && pedidos.length) ? pedidos : JSON.parse(localStorage.getItem('nx_pedidos')||'[]');
+  const todosLosPedidos = (typeof pedidos !== 'undefined' && pedidos.length) ? pedidos : JSON.parse(localStorage.getItem('nx-pedidos')||'[]');
   const repsLocal = (typeof repartidores !== 'undefined' && repartidores.length)
-    ? repartidores : JSON.parse(localStorage.getItem('nx_repartidores')||'[]');
+    ? repartidores : JSON.parse(localStorage.getItem('nx-repartidores')||'[]');
   const repIdSesion = localStorage.getItem('nx_rep_id')||'';
   const repObj = repsLocal.find(r=>r.id===repIdSesion) ||
                  repsLocal.find(r=>(r.nombre||'').toUpperCase()===(repLiqNombre||'').toUpperCase());
@@ -8468,12 +8315,6 @@ function adminLiqInit(){
   adminLiqRenderDias();
   adminLiqRender();
   adminLiqActualizarBadges();
-  liqSincronizarDesdeFirebase().then(()=>{
-    adminLiqRenderDias();
-    adminLiqRender();
-    adminLiqActualizarBadges();
-  });
-  liqEscucharFirebase();
 }
 
 function adminLiqRenderDias(){
@@ -8518,7 +8359,7 @@ function adminLiqRenderMotos(){
   const motos = diaData.motos || {};
 
   // Obtener todos los repartidores del sistema
-  const reps = (typeof repartidores !== 'undefined' && repartidores.length) ? repartidores : JSON.parse(localStorage.getItem('nx_repartidores')||'[]');
+  const reps = (typeof repartidores !== 'undefined' && repartidores.length) ? repartidores : JSON.parse(localStorage.getItem('nx-repartidores')||'[]');
 
   if(!reps.length && !Object.keys(motos).length){
     cont.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted)">
@@ -8651,8 +8492,8 @@ function adminLiqRenderTiendas(){
   const tiendas_liq = diaData.tiendas || {};
 
   // Obtener tiendas del sistema
-  const tiendas = JSON.parse(localStorage.getItem('nx_tiendas')||'[]');
-  const pedidos  = JSON.parse(localStorage.getItem('nx_pedidos')||'[]');
+  const tiendas = JSON.parse(localStorage.getItem('nx-tiendas')||'[]');
+  const pedidos  = JSON.parse(localStorage.getItem('nx-pedidos')||'[]');
 
   // Obtener tiendas únicas que tienen pedidos en este día
   const tiendasDia = new Set(pedidos.filter(p=>(p.fecha||'').slice(0,10)===adminLiqDiaActual).map(p=>(p.tienda||'').toUpperCase()));
@@ -8779,7 +8620,7 @@ function adminLiqActualizarBadges(){
 }
 
 function adminLiqNotificar(){
-  // El listener de Firebase actualizará automáticamente en tiempo real
+  // Llamado cuando un moto envía liq
   adminLiqActualizarBadges();
 }
 
@@ -9158,9 +8999,11 @@ function _actualizarBadgeOffline(){
 // Encolar cambio de estado cuando no hay internet
 function encolarCambioOffline(idx, estado, extra){
   const q=_getOfflineQueue();
-  // Evitar duplicados del mismo pedido
-  const existing=q.findIndex(c=>c.idx===idx);
-  const cambio={idx, estado, extra:extra||{}, ts:Date.now(), cod:pedidos[idx]?.cod};
+  const cod = pedidos[idx]?.cod;
+  if(!cod){ console.warn('encolarCambioOffline: pedido sin cod en idx', idx); return; }
+  // Deduplicar por cod (no por idx, que puede cambiar si el array se reordena)
+  const existing=q.findIndex(c=>c.cod===cod);
+  const cambio={cod, estado, extra:extra||{}, ts:Date.now()};
   if(existing>=0)q[existing]=cambio;else q.push(cambio);
   _saveOfflineQueue(q);
   _actualizarBadgeOffline();
@@ -9173,10 +9016,12 @@ function sincronizarOffline(){
   if(!q.length){toast('✅ Todo sincronizado');return;}
   let ok=0;
   q.forEach(c=>{
-    if(pedidos[c.idx]){
-      pedidos[c.idx].estado=c.estado;
-      if(c.extra.pagoTipo)pedidos[c.idx].pagoTipo=c.extra.pagoTipo;
-      if(c.extra.postobs)pedidos[c.idx].postobs=c.extra.postobs;
+    // Buscar por cod (único estable), no por idx
+    const pedIdx = pedidos.findIndex(p=>p.cod===c.cod);
+    if(pedIdx>=0){
+      pedidos[pedIdx].estado=c.estado;
+      if(c.extra.pagoTipo)pedidos[pedIdx].pagoTipo=c.extra.pagoTipo;
+      if(c.extra.postobs)pedidos[pedIdx].postobs=c.extra.postobs;
       ok++;
     }
   });
@@ -9675,80 +9520,6 @@ window.addEventListener('load', function() {
     document.getElementById('role-selector').style.display = 'flex';
   }, 80);
 });
-</script>
-
-<!-- ══ NX CONFIRM MODAL ══ -->
-<div id="nx-confirm-overlay">
-  <div id="nx-confirm-box">
-    <div class="nxc-stripe"></div>
-    <div class="nxc-icon"  id="nxc-icon">🗑</div>
-    <div class="nxc-title" id="nxc-title">¿CONFIRMAR?</div>
-    <div class="nxc-msg"   id="nxc-msg">Esta acción no se puede deshacer.</div>
-    <div class="nxc-detail" id="nxc-detail" style="display:none"></div>
-    <div class="nxc-actions">
-      <button class="nxc-btn nxc-cancel" onclick="nxConfirmCancel()">Cancelar</button>
-      <button class="nxc-btn nxc-ok"     id="nxc-ok-btn">Eliminar</button>
-    </div>
-  </div>
-</div>
-
-
-<script>
-
-// ══ NX CONFIRM — motor de confirmación ══
-let _nxConfirmResolve = null;
-function nxConfirm({title='¿CONFIRMAR?',msg='Esta acción no se puede deshacer.',detail=null,icon='🗑',okLabel='Eliminar',type='danger'}={}){
-  return new Promise(resolve=>{
-    _nxConfirmResolve=resolve;
-    const box=document.getElementById('nx-confirm-box');
-    const overlay=document.getElementById('nx-confirm-overlay');
-    document.getElementById('nxc-icon').textContent=icon;
-    document.getElementById('nxc-title').textContent=title;
-    document.getElementById('nxc-msg').textContent=msg;
-    document.getElementById('nxc-ok-btn').textContent=okLabel;
-    const detEl=document.getElementById('nxc-detail');
-    if(detail){detEl.textContent=detail;detEl.style.display='block';}
-    else{detEl.style.display='none';}
-    box.classList.toggle('warning',type==='warning');
-    overlay.classList.add('open');
-    const onKey=e=>{if(e.key==='Escape'){nxConfirmCancel();document.removeEventListener('keydown',onKey);}};
-    document.addEventListener('keydown',onKey);
-  });
-}
-function nxConfirmCancel(){
-  document.getElementById('nx-confirm-overlay').classList.remove('open');
-  if(_nxConfirmResolve){_nxConfirmResolve(false);_nxConfirmResolve=null;}
-}
-document.addEventListener('DOMContentLoaded',function(){
-  const okBtn=document.getElementById('nxc-ok-btn');
-  if(okBtn)okBtn.addEventListener('click',()=>{
-    document.getElementById('nx-confirm-overlay').classList.remove('open');
-    if(_nxConfirmResolve){_nxConfirmResolve(true);_nxConfirmResolve=null;}
-  });
-  const ov=document.getElementById('nx-confirm-overlay');
-  if(ov)ov.addEventListener('click',e=>{if(e.target===ov)nxConfirmCancel();});
-});
-
-</script>
-
-<script>
-
-// ── helpers extra de nxConfirm ──
-async function limpiarTodosEnvios(){
-  const ok=await nxConfirm({title:'¿LIMPIAR ENVÍOS?',msg:'Se borrarán todos los envíos del listado. No se puede deshacer.',icon:'🧹',okLabel:'Limpiar todo',type:'warning'});
-  if(!ok)return;
-  envios=[];guardarEnvios();renderEnvios();
-  toast('🗑 Todos los envíos eliminados');
-}
-async function eliminarDespachoInline(id){
-  const d=despachos.find(x=>x.id===id);
-  const ok=await nxConfirm({title:'¿ELIMINAR DESPACHO?',msg:'Se borrará el despacho del motorizado asignado.',detail:d?`${d.repNombre||''} · ${d.items?.length||0} ítem(s)`:'',icon:'📋',okLabel:'Eliminar',type:'danger'});
-  if(!ok)return;
-  despachos=despachos.filter(x=>x.id!==id);
-  guardarDatos();renderAdminDespachos();
-  toast('🗑 Eliminado');
-}
-
 </script>
 </body>
 </html>
