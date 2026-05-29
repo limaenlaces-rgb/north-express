@@ -2419,12 +2419,19 @@ async function _fbGuardarNube(){
     const pedidosMerge = [...pedidosBase];
     pedidos.forEach(local => {
       const idx = pedidosMerge.findIndex(fb => fb.cod === local.cod);
+      // Preservar fotos existentes en Firebase y fusionar con fotos locales nuevas
+      const fotasEnFb = (idx >= 0 ? pedidosMerge[idx].fotos : null) || [];
+      const fotasLocales = local.fotos || [];
+      // Combinar: fotos de FB + fotos locales que no estén ya (por nombre+fecha)
+      const fotosMerge = [...fotasEnFb];
+      fotasLocales.forEach(fl => {
+        const yaExiste = fotosMerge.some(ff => ff.nombre === fl.nombre && ff.fecha === fl.fecha);
+        if(!yaExiste && fl.data) fotosMerge.push(fl);
+      });
       if(idx >= 0){
-        // El pedido ya existe en FB — actualizar con versión local (más reciente)
-        pedidosMerge[idx] = {...pedidosMerge[idx], ...local, fotos:[]};
+        pedidosMerge[idx] = {...pedidosMerge[idx], ...local, fotos: fotosMerge};
       } else {
-        // Pedido nuevo que no está en FB — agregar
-        pedidosMerge.push({...local, fotos:[]});
+        pedidosMerge.push({...local, fotos: fotosMerge});
       }
     });
 
@@ -5356,22 +5363,41 @@ function tUpEnviarPedidos(){
   const n=tUpPedidos.length;
   const nuevos=[...tUpPedidos];
   tUpPedidos=[];
-  // Merge con Firebase antes de guardar para no perder pedidos de otras sesiones
+
   const doEnvio = ()=>{
-    nuevos.forEach(np=>{
-      if(!pedidos.find(p=>p.cod===np.cod)) pedidos.push(np);
-    });
-    pedidosNuevosTienda.push(...nuevos);
-    guardarDatos();
-    renderTienda(tiendaActual);
-    renderAll();
-    toast(`🚀 ${n} pedido(s) enviados a North Express`);
+    if(_fbDb){
+      // Insertar via transaction para que el listener no pise los pedidos nuevos
+      _fbDb.ref('datos/pedidos').transaction(fbPedidosRaw => {
+        const fbPedidos = Array.isArray(fbPedidosRaw) ? fbPedidosRaw : [];
+        const mapa = {};
+        fbPedidos.forEach(p => { if(p && p.cod) mapa[p.cod] = p; });
+        nuevos.forEach(np => { if(np && np.cod && !mapa[np.cod]) mapa[np.cod] = {...np, fotos:[]}; });
+        return Object.values(mapa);
+      }).then(()=>{
+        nuevos.forEach(np=>{ if(!pedidos.find(p=>p.cod===np.cod)) pedidos.push(np); });
+        pedidosNuevosTienda.push(...nuevos);
+        guardarDatos();
+        renderTienda(tiendaActual);
+        renderAll();
+        toast(`🚀 ${n} pedido(s) enviados a North Express`);
+      }).catch(()=>{
+        nuevos.forEach(np=>{ if(!pedidos.find(p=>p.cod===np.cod)) pedidos.push(np); });
+        pedidosNuevosTienda.push(...nuevos);
+        guardarDatos();
+        renderTienda(tiendaActual);
+        renderAll();
+        toast(`🚀 ${n} pedido(s) enviados a North Express`);
+      });
+    } else {
+      nuevos.forEach(np=>{ if(!pedidos.find(p=>p.cod===np.cod)) pedidos.push(np); });
+      pedidosNuevosTienda.push(...nuevos);
+      guardarDatos();
+      renderTienda(tiendaActual);
+      renderAll();
+      toast(`🚀 ${n} pedido(s) enviados a North Express`);
+    }
   };
-  if(_fbDb){
-    _fbCargarNube().then(()=>doEnvio()).catch(()=>doEnvio());
-  } else {
-    doEnvio();
-  }
+  doEnvio();
   const wrap=document.getElementById("tup-preview-wrap");
   if(wrap)wrap.innerHTML=`<div style="text-align:center;padding:24px;color:var(--jade)">
     <div style="font-size:36px;margin-bottom:8px">✅</div>
