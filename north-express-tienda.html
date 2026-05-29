@@ -2071,7 +2071,6 @@ tbody tr:hover{background:#fafaf7;}
       <div class="fl ff"><label>Nombre de la tienda</label><input type="text" id="tienda-f-nombre" placeholder="Ej: IFYS" oninput="this.value=this.value.toUpperCase()"></div>
       <div class="fl"><label>Contraseña acceso tienda</label><input type="password" id="tienda-f-pass" placeholder="••••••••"></div>
       <div class="fl"><label>Número Yape</label><input type="tel" id="tienda-f-yape-num" placeholder="987 654 321" maxlength="12"></div>
-      <div class="fl"><label>Nombre titular Yape</label><input type="text" id="tienda-f-yape-nombre" placeholder="Ej: María López"></div>
       <div class="fl ff">
         <label>📷 Código QR Yape (imagen)</label>
         <div style="display:flex;align-items:center;gap:14px;margin-top:4px">
@@ -3685,33 +3684,15 @@ function seleccionarPago(tipo, pedidoIdx){
     bTi.style.background='rgba(108,31,201,.1)';bTi.style.borderColor='rgba(108,31,201,.2)';bTi.style.transform='scale(1)';
     if(yapeInline) yapeInline.style.display='none';
     cerrarYapePanel();
-    // Efectivo: habilitar confirmar directamente
-    const btn=document.getElementById('btn-confirmar-entrega');
-    btn.style.opacity='1';btn.style.pointerEvents='auto';
-    btn.style.background='var(--jade)';
   }else{
     bTi.style.background='rgba(108,31,201,.35)';bTi.style.borderColor='#a855f7';bTi.style.transform='scale(1.03)';
     bEf.style.background='rgba(0,184,122,.08)';bEf.style.borderColor='rgba(0,184,122,.2)';bEf.style.transform='scale(1)';
     // Mostrar QR inline en vez del panel lateral
     if(yapeInline) yapeInline.style.display='block';
-    // Yape: bloquear confirmar hasta que haya foto de comprobante
-    const btn=document.getElementById('btn-confirmar-entrega');
-    const yaHayFoto=(window._fotosEntrega||[]).length>0;
-    btn.style.opacity=yaHayFoto?'1':'0.35';
-    btn.style.pointerEvents=yaHayFoto?'auto':'none';
-    btn.style.background='var(--jade)';
-    // Mostrar aviso de comprobante obligatorio
-    let avisoYape=document.getElementById('aviso-yape-comprobante');
-    if(!avisoYape){
-      avisoYape=document.createElement('div');
-      avisoYape.id='aviso-yape-comprobante';
-      avisoYape.style.cssText='background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.4);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#c084fc;display:flex;align-items:center;gap:8px;';
-      avisoYape.innerHTML='📷 <strong>Sube el comprobante del Yape</strong> para poder confirmar la entrega';
-      const grid=document.getElementById('entrega-fotos-grid');
-      if(grid&&grid.parentElement) grid.parentElement.insertBefore(avisoYape,grid.parentElement.firstChild);
-    }
-    avisoYape.style.display='flex';
   }
+  const btn=document.getElementById('btn-confirmar-entrega');
+  btn.style.opacity='1';btn.style.pointerEvents='auto';
+  btn.style.background='var(--jade)';
 }
 
 function agregarFotosEntrega(input,idx){
@@ -3738,13 +3719,6 @@ function agregarFotosEntrega(input,idx){
       wrap.appendChild(badge);
       const label=grid.querySelector('label');
       grid.insertBefore(wrap,label);
-      // Si es pago tienda, habilitar el botón CONFIRMAR al subir la primera foto
-      if(pago==='tienda'){
-        const btn=document.getElementById('btn-confirmar-entrega');
-        if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}
-        const aviso=document.getElementById('aviso-yape-comprobante');
-        if(aviso) aviso.style.display='none';
-      }
     };
     r.readAsDataURL(f);
   });
@@ -3781,13 +3755,6 @@ function finalizarEntregaFinal(idx){
   if(!pago){toast('⚠️ Selecciona cómo pagó el cliente');return;}
   const obs=document.getElementById('entrega-obs')?.value?.trim()||'';
   const fotos=window._fotosEntrega||[];
-  // Si el pago fue con Yape (tienda), exigir foto de comprobante
-  if(pago==='tienda'&&fotos.length===0){
-    toast('📷 Debes subir el comprobante del Yape para confirmar');
-    const label=document.querySelector('#entrega-fotos-grid label');
-    if(label){label.style.borderColor='#a855f7';label.style.animation='pulse 1s infinite';}
-    return;
-  }
   // Si no hay internet, encolar el cambio y actualizar UI localmente
   if(!navigator.onLine){
     encolarCambioOffline(idx,'ENTREGADO',{pagoTipo:pago,postobs:obs});
@@ -5134,7 +5101,7 @@ function tUpParsePaste(txt){
 function tUpProcesar(filas){
   // Log para debug: ver columnas de la primera fila
   if(filas[0]) console.log('Columnas detectadas:', filas[0].map((v,i)=>`[${i}]: ${v}`).join(' | '));
-  tUpPedidos=filas.filter(f=>f.length>=2&&f[0]).map(f=>{
+  tUpPedidos=filas.filter(f=>f.length>=2&&f[0]).map((f,i)=>{
     // Buscar columna de cobrar: puede estar en pos 10 o buscar por valor numérico
     let cobrar = parseMoney(f[10])||0;
     // Si f[10] no tiene valor numérico, buscar en otras columnas
@@ -5158,7 +5125,7 @@ function tUpProcesar(filas){
     const producto  = f[7+off]||"";
     const unidades  = parseInt(f[8+off])||1;
     if(!cobrar) cobrar = parseMoney(f[9+off])||0;
-    return{cod:("TUP-"+Date.now().toString(36).slice(-4)).toUpperCase(),tienda:tiendaActual,
+    return{cod:("TUP-"+Date.now().toString(36).slice(-3)+i.toString(36).padStart(2,"0")).toUpperCase(),tienda:tiendaActual,
       nombre,direccion,referencia,distrito,celular,obs,producto,unidades,
       cobrar,delivery:12,abonar:cobrar-12,estado:"CONFIRMADO",postobs:"",fotos:[],
       lat:null,lng:null,repartidorId:null,fecha:new Date().toISOString().slice(0,10),_nuevo:true};
@@ -5590,7 +5557,6 @@ function abrirModalTienda(){
   document.getElementById('tienda-f-nombre').value='';
   document.getElementById('tienda-f-pass').value='';
   document.getElementById('tienda-f-yape-num').value='';
-  const fYNom=document.getElementById('tienda-f-yape-nombre'); if(fYNom) fYNom.value='';
   document.getElementById('tienda-f-obs').value='';
   document.getElementById('tienda-qr-preview').innerHTML='📷';
   document.getElementById('tienda-qr-remove').style.display='none';
@@ -5605,8 +5571,6 @@ function editarTienda(i){
   document.getElementById('tienda-f-nombre').value = t.nombre;
   document.getElementById('tienda-f-pass').value = t.pass||'';
   document.getElementById('tienda-f-yape-num').value = t.yapeNum||'';
-  const fYapeNombre = document.getElementById('tienda-f-yape-nombre');
-  if(fYapeNombre) fYapeNombre.value = t.yapeNombre||'';
   document.getElementById('tienda-f-obs').value = t.obs||'';
   const prev = document.getElementById('tienda-qr-preview');
   if(t.yapeQr){
@@ -5647,14 +5611,13 @@ async function guardarTienda(){
   const nombre = document.getElementById('tienda-f-nombre').value.trim().toUpperCase();
   const pass   = document.getElementById('tienda-f-pass').value.trim();
   const yapeNum= document.getElementById('tienda-f-yape-num').value.trim();
-  const yapeNombre= (document.getElementById('tienda-f-yape-nombre')||{}).value?.trim()||'';
   const obs    = document.getElementById('tienda-f-obs').value.trim();
   if(!nombre){toast('⚠️ Ingresa el nombre de la tienda');return;}
   const editId = document.getElementById('tienda-edit-id').value;
   if(editId){
     const idx = tiendas.findIndex(t=>t.id===editId);
     if(idx>=0){
-      tiendas[idx]={...tiendas[idx], nombre, pass, yapeNum, yapeNombre, yapeQr:tiendaQrTemp, obs};
+      tiendas[idx]={...tiendas[idx], nombre, pass, yapeNum, yapeQr:tiendaQrTemp, obs};
     }
     // Actualizar contraseña en Firebase Auth si está disponible
     if(_fbAuth && pass){
@@ -5669,7 +5632,7 @@ async function guardarTienda(){
   }else{
     const dup = tiendas.find(t=>t.nombre===nombre);
     if(dup){toast('⚠️ Ya existe una tienda con ese nombre');return;}
-    tiendas.push({id:'t'+Date.now(), nombre, pass, yapeNum, yapeNombre, yapeQr:tiendaQrTemp, obs});
+    tiendas.push({id:'t'+Date.now(), nombre, pass, yapeNum, yapeQr:tiendaQrTemp, obs});
     // Crear usuario en Firebase Auth para que la tienda pueda autenticarse
     if(_fbAuth && pass){
       try{
@@ -7982,7 +7945,49 @@ function liqCargar(){
   try{ return JSON.parse(localStorage.getItem(LIQ_KEY)||'{}'); }
   catch(e){ return {}; }
 }
-function liqGuardar(data){ localStorage.setItem(LIQ_KEY, JSON.stringify(data)); }
+function liqGuardar(data){
+  try{
+    localStorage.setItem(LIQ_KEY, JSON.stringify(data));
+  } catch(e){
+    if(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED'){
+      // Liberar espacio: comprimir fotos de días anteriores a miniatura
+      const hoyStr = hoy();
+      let liberado = false;
+      Object.keys(data).forEach(dia=>{
+        if(dia===hoyStr) return;
+        const motos = (data[dia]||{}).motos||{};
+        Object.keys(motos).forEach(nombre=>{
+          if(motos[nombre].fotoMoto && motos[nombre].fotoMoto.length > 5000){
+            motos[nombre].fotoMoto = motos[nombre].fotoMoto.slice(0,5000)+'[truncada]';
+            liberado = true;
+          }
+          if(motos[nombre].fotoAdmin && motos[nombre].fotoAdmin.length > 5000){
+            motos[nombre].fotoAdmin = motos[nombre].fotoAdmin.slice(0,5000)+'[truncada]';
+            liberado = true;
+          }
+        });
+        const tiendas = (data[dia]||{}).tiendas||{};
+        Object.keys(tiendas).forEach(nombre=>{
+          if(tiendas[nombre].fotoAdmin && tiendas[nombre].fotoAdmin.length > 5000){
+            tiendas[nombre].fotoAdmin = tiendas[nombre].fotoAdmin.slice(0,5000)+'[truncada]';
+            liberado = true;
+          }
+        });
+      });
+      try{
+        localStorage.setItem(LIQ_KEY, JSON.stringify(data));
+        if(liberado) console.warn('NX: localStorage lleno, se comprimieron fotos antiguas');
+      } catch(e2){
+        // Último recurso: borrar días muy antiguos
+        const dias = Object.keys(data).filter(d=>d!==hoyStr).sort();
+        if(dias.length > 0){
+          delete data[dias[0]];
+          try{ localStorage.setItem(LIQ_KEY, JSON.stringify(data)); } catch(e3){ console.error('NX: No se pudo guardar liquidación', e3); toast('⚠️ Almacenamiento lleno. Borra datos antiguos en configuración.'); }
+        }
+      }
+    }
+  }
+}
 
 function liqGetDia(data, dia){ return data[dia] || { motos:{}, tiendas:{} }; }
 
@@ -8640,29 +8645,6 @@ function tiendaLiqRenderResumen(){
   if(el('tienda-liq-env-count')) el('tienda-liq-env-count').textContent=`${calc.envCount} envíos`;
   if(el('tienda-liq-env-monto')) el('tienda-liq-env-monto').textContent=`S/ ${calc.envMonto.toFixed(2)}`;
   if(el('tienda-liq-total')) el('tienda-liq-total').textContent=`S/ ${calc.total.toFixed(2)}`;
-
-  // Calcular monto recibido vía Yape (cobrado directamente por la tienda)
-  const todosLosPedidos = (typeof pedidos !== 'undefined' && pedidos.length)
-    ? pedidos : JSON.parse(localStorage.getItem('nx_pedidos')||'[]');
-  const pedsTiendaDia = todosLosPedidos.filter(p=>{
-    const fecha=(p.fecha||'').slice(0,10);
-    return (p.tienda||'').toUpperCase()===nombre.toUpperCase() && fecha===tiendaLiqDiaActual;
-  });
-  const pedidosYape = pedsTiendaDia.filter(p=>p.estado==='ENTREGADO'&&p.pagoTipo==='tienda');
-  const montoYape = pedidosYape.reduce((s,p)=>s+parseFloat(p.cobrar||0),0);
-  let yapeRow = el('tienda-liq-yape-row');
-  if(!yapeRow){
-    yapeRow=document.createElement('div');
-    yapeRow.id='tienda-liq-yape-row';
-    yapeRow.className='liq-row';
-    yapeRow.style.cssText='border-top:2px solid var(--border);margin-top:8px;padding-top:12px;';
-    yapeRow.innerHTML='<span class=\'lbl\'>💜 Cobrado vía Yape (debes a NX)</span><span class=\'val\' id=\'tienda-liq-yape-monto\' style=\'color:#a855f7\'>S/ 0.00</span>';
-    const liqBody=el('tienda-liq-ce-monto')?.closest('.liq-body');
-    if(liqBody) liqBody.appendChild(yapeRow);
-  }
-  const yapeMontoEl=el('tienda-liq-yape-monto');
-  if(yapeMontoEl) yapeMontoEl.textContent=`S/ ${montoYape.toFixed(2)}`;
-  if(yapeRow) yapeRow.style.display=pedidosYape.length?'flex':'none';
 
   // Estado comprobante
   const data = liqCargar();
